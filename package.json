@@ -1,0 +1,43 @@
+{
+	"name": "@human-synthesis/norns-tron",
+	"version": "0.0.1",
+	"description": "TRON serialization for the Norns ecosystem — token-efficient, faster-than-JSON wire format for APIs and LLM-facing output.",
+	"license": "MIT",
+	"author": "Daniel Teodoroiu (https://humansynthesis.ai)",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/human-synthesis/norns-tron.git"
+	},
+	"files": [
+		"src",
+		"wasm",
+		"README.md",
+		"PERFORMANCE.md"
+	],
+	"scripts": {
+		"test": "bun test",
+		"embed-wasm": "bun scripts/embed-wasm.mjs"
+	},
+	"exports": {
+		".": "./src/index.js",
+		"./server": "./src/server.js",
+		"./client": "./src/client.js",
+		"./valibot": "./src/valibot.js",
+		"./package.json": "./package.json"
+	},
+	"peerDependencies": {
+		"valibot": ">=0.31.0"
+	},
+	"peerDependenciesMeta": {
+		"valibot": {
+			"optional": true
+		}
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
