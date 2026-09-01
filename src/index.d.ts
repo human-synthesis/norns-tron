@@ -87,6 +87,19 @@ export function defineSchema(spec: SchemaSpec): CompiledSchema;
 /** A registry for services serving several response shapes. */
 export function createRegistry(): SchemaRegistry;
 
+/**
+ * Format a value as canonical TRON text — the deterministic, line-oriented,
+ * JSON-compatible on-disk form used for spec files. Same value → byte-identical
+ * text; `decode()` reads it back with no special cases.
+ */
+export function formatCanonical(
+  value: unknown,
+  opts?: { indent?: number; maxInline?: number; keyPriority?: string[] }
+): string;
+
+/** Default key ordering for spec files: contract keys before bulk collections. */
+export const SPEC_KEY_PRIORITY: string[];
+
 /** True when the WASM fast path is usable here. */
 export function wasmAvailable(): boolean;
 

@@ -21,6 +21,7 @@ import * as ENCODER from './core/tron-encode.js';
 import * as AUTO from './core/tron-auto.js';
 import * as SCHEMA from './core/tron-schema.js';
 import * as WASM from './core/tron-wasm.js';
+import { formatCanonical, SPEC_KEY_PRIORITY } from './canonical.js';
 
 // Below this many bytes of equivalent JSON, the fixed costs of shape detection
 // dominate and plain JSON is simply faster and no smaller. Measured crossover
@@ -155,6 +156,8 @@ const raw = {
 export {
   encode,
   decode,
+  formatCanonical,
+  SPEC_KEY_PRIORITY,
   encodeColumnar,
   decodeColumnar,
   defineSchema,
