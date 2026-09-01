@@ -15,10 +15,6 @@
 		"README.md",
 		"PERFORMANCE.md"
 	],
-	"scripts": {
-		"test": "bun test",
-		"embed-wasm": "bun scripts/embed-wasm.mjs"
-	},
 	"exports": {
 		".": "./src/index.js",
 		"./server": "./src/server.js",
@@ -40,5 +36,12 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"test": "bun test",
+		"embed-wasm": "bun scripts/embed-wasm.mjs"
+	},
+	"devDependencies": {
+		"valibot": "^1.4.0"
 	}
 }
