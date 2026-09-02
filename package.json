@@ -1,6 +1,6 @@
 {
 	"name": "@human-synthesis/norns-tron",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"description": "TRON serialization for the Norns ecosystem — token-efficient, faster-than-JSON wire format for APIs and LLM-facing output.",
 	"license": "MIT",
 	"author": "Daniel Teodoroiu (https://humansynthesis.ai)",

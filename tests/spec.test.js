@@ -7,9 +7,11 @@ import { formatCanonical } from '../src/canonical.js';
 import {
   APP_SPEC,
   SPEC_EXT,
+  SPEC_EXTS,
   combineHashes,
   readSpec,
   readSpecs,
+  specFilename,
   specHash,
   writeSpec,
 } from '../src/spec.js';
@@ -129,7 +131,53 @@ describe('readSpecs', () => {
     }
   });
 
-  test('app is null when app.tron is absent', () => {
+  test('reads legacy .tron files and mixed directories, reporting filenames', () => {
+    const { dir, done } = tmp();
+    try {
+      expect(SPEC_EXT).toBe('.t');
+      expect(SPEC_EXTS).toEqual(['.t', '.tron']);
+      writeSpec(join(dir, `${APP_SPEC}.tron`), APP);
+      writeSpec(join(dir, 'blog.t'), BLOG);
+
+      const specs = readSpecs(dir);
+      expect(specs.app).toEqual(APP);
+      expect(specs.modules.blog).toEqual(BLOG);
+      expect(specs.files).toEqual({ app: 'app.tron', blog: 'blog.t' });
+      expect(specFilename('app', specs.files)).toBe('app.tron');
+      expect(specFilename('blog', specs.files)).toBe('blog.t');
+      expect(specFilename('shop', specs.files)).toBe('shop.t');
+    } finally {
+      done();
+    }
+  });
+
+  test('hashes and version do not depend on the extension used', () => {
+    const { dir, done } = tmp();
+    try {
+      writeSpec(join(dir, 'blog.t'), BLOG);
+      const short = readSpecs(dir);
+      rmSync(join(dir, 'blog.t'));
+      writeSpec(join(dir, 'blog.tron'), BLOG);
+      const long = readSpecs(dir);
+      expect(long.hashes).toEqual(short.hashes);
+      expect(long.version).toBe(short.version);
+    } finally {
+      done();
+    }
+  });
+
+  test('rejects the same module spelled with both extensions', () => {
+    const { dir, done } = tmp();
+    try {
+      writeSpec(join(dir, 'blog.t'), BLOG);
+      writeSpec(join(dir, 'blog.tron'), BLOG);
+      expect(() => readSpecs(dir)).toThrow(/duplicate spec for "blog"/);
+    } finally {
+      done();
+    }
+  });
+
+  test('app is null when the app spec is absent', () => {
     const { dir, done } = tmp();
     try {
       writeSpec(join(dir, `blog${SPEC_EXT}`), BLOG);

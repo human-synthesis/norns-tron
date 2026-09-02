@@ -1,8 +1,10 @@
 /**
  * Spec-file helpers — server-side only (`@human-synthesis/norns-tron/spec`).
  *
- * A Norns app's canonical spec lives in `specs/` as one `.tron` file per
- * module plus `app.tron`, written in canonical form (see canonical.js).
+ * A Norns app's canonical spec lives in `specs/` as one `.t` file per
+ * module plus `app.t`, written in canonical form (see canonical.js). The
+ * long-form `.tron` extension is accepted too; `.t` is the default for new
+ * files, matching the other Norns extensions (`.n`, `.c`, `.p`).
  * These helpers read/write that directory and compute the content-addressed
  * version hashes used by `ifVersion` optimistic checks and incremental
  * generation.
@@ -15,8 +17,15 @@ import { basename, dirname, join } from 'node:path';
 import { formatCanonical } from './canonical.js';
 import * as AUTO from './core/tron-auto.js';
 
-export const SPEC_EXT = '.tron';
+export const SPEC_EXT = '.t';
+/** Accepted spec extensions, in preference order — `.t` is the default. */
+export const SPEC_EXTS = ['.t', '.tron'];
 export const APP_SPEC = 'app';
+
+/** On-disk filename for a module: its existing file, else `<name>.t`. */
+export function specFilename(name, files) {
+  return files?.[name] ?? name + SPEC_EXT;
+}
 
 /** sha256 hex of a value's canonical text — the unit of change detection. */
 export function specHash(value) {
@@ -55,27 +64,36 @@ export function writeSpec(file, value) {
  *
  * @param {string} dir
  * @returns {{
- *   app: *,                            // app.tron contents (null if absent)
+ *   app: *,                            // app spec contents (null if absent)
  *   modules: Record<string, *>,        // module name -> spec value
+ *   files: Record<string, string>,     // module name -> on-disk filename
  *   hashes: Record<string, string>,    // per-file canonical hash (incl. 'app')
  *   version: string                    // hash over all files — the app version
  * }}
  */
 export function readSpecs(dir) {
   const names = readdirSync(dir)
-    .filter((f) => f.endsWith(SPEC_EXT))
+    .filter((f) => SPEC_EXTS.some((ext) => f.endsWith(ext)))
     .sort();
   const modules = {};
+  const files = {};
   const hashes = {};
   let app = null;
   for (const f of names) {
-    const name = basename(f, SPEC_EXT);
+    const ext = SPEC_EXTS.find((e) => f.endsWith(e));
+    const name = basename(f, ext);
+    if (files[name] !== undefined) {
+      throw new Error(
+        `duplicate spec for "${name}": ${files[name]} and ${f} — keep one (\`.t\` is the default)`
+      );
+    }
+    files[name] = f;
     const value = readSpec(join(dir, f));
     hashes[name] = specHash(value);
     if (name === APP_SPEC) app = value;
     else modules[name] = value;
   }
-  return { app, modules, hashes, version: combineHashes(hashes) };
+  return { app, modules, files, hashes, version: combineHashes(hashes) };
 }
 
 /**

@@ -1,5 +1,10 @@
-export const SPEC_EXT: '.tron';
+export const SPEC_EXT: '.t';
+/** Accepted spec extensions, in preference order — `.t` is the default. */
+export const SPEC_EXTS: readonly ['.t', '.tron'];
 export const APP_SPEC: 'app';
+
+/** On-disk filename for a module: its existing file, else `<name>.t`. */
+export function specFilename(name: string, files?: Record<string, string>): string;
 
 /** sha256 hex of a value's canonical text — the unit of change detection. */
 export function specHash(value: unknown): string;
@@ -20,6 +25,7 @@ export function writeSpec(
 export function readSpecs(dir: string): {
   app: unknown;
   modules: Record<string, unknown>;
+  files: Record<string, string>;
   hashes: Record<string, string>;
   version: string;
 };
